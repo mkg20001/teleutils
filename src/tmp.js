@@ -25,7 +25,7 @@ module.exports = (id, {interval}) => {
         if (file.cleaned) {
           warn('file %s should have been cleaned, was reused', file.path)
           file.cleanup()
-        } else if (file.expiresAt() < Date.now()) {
+        } else if (file.expiresAt < Date.now()) {
           warn('file %s is expired, was overused', file.path)
           file.cleanup()
         } else {
@@ -35,7 +35,7 @@ module.exports = (id, {interval}) => {
         return true
       } else {
         if (file.cleaned) {
-          if (file.expiresAt() < Date.now()) {
+          if (file.expiresAt < Date.now()) {
             warn('file %s expired, without cleaning', file.path)
           }
         }
