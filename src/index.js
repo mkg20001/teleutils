@@ -7,6 +7,7 @@ const TeleBot = require('telebot')
 const _ERROR = require('./error')
 const _EXEC = require('./exec')
 const _FETCH = require('./fetch')
+const _QUEUE = require('./queue')
 const _TMP = require('./tmp')
 
 module.exports = (id, {token, helloMessage, TMP, FETCH}) => {
@@ -21,6 +22,7 @@ module.exports = (id, {token, helloMessage, TMP, FETCH}) => {
 
   // component initialization
   const error = _ERROR(bot)
+  const queue = _QUEUE()
   const tmp = _TMP(id, TMP || {})
   const fetch = _FETCH(bot, tmp, FETCH || {})
 
@@ -40,6 +42,7 @@ module.exports = (id, {token, helloMessage, TMP, FETCH}) => {
     error,
     exec: _EXEC,
     fetch,
-    tmp: tmp.getTmpFile
+    tmp: tmp.getTmpFile,
+    queue
   }
 }
