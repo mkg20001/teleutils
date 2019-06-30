@@ -43,8 +43,8 @@ module.exports = (id, {interval}) => {
     })
 
     fs.readdirSync(TMP).filter(file => !FILES[file]).forEach(file => {
-      warn('file %s shouldn\'t exist', file)
-      rimraf(file)
+      warn('file %s shouldn\'t exist, removing', file)
+      rimraf(path.join(TMP, file))
     })
   }
 
