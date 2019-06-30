@@ -9,7 +9,6 @@ module.exports = (bot) => {
   Sentry.init({dsn: process.env.SENTRY_DSN})
 
   const origOn = bot.on.bind(bot)
-  let events = {}
   bot.on = (ev, fnc, ...a) => {
     let wrapped = async (msg, ...a) => {
       try {
@@ -30,8 +29,10 @@ module.exports = (bot) => {
         }
       }
     }
-    events[ev] = wrapped
-    origOn(ev, wrapped, ...a)
+
+    origOn(ev, (...a) => {
+      wrapped(...a)
+    }, ...a)
   }
 
   return Sentry

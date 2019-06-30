@@ -45,6 +45,7 @@ module.exports = () => {
   }
 
   queue.init = initQueue
+  queue._queues = queues
 
   return queue
 }
