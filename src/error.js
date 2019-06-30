@@ -5,7 +5,7 @@ const ERROR_REPLY = 'Sorry, but something went wrong internally'
 
 const Sentry = require('@sentry/node')
 
-module.exports = (bot) => {
+module.exports = (bot, breakSymetry) => {
   Sentry.init({dsn: process.env.SENTRY_DSN})
 
   const origOn = bot.on.bind(bot)
@@ -30,9 +30,13 @@ module.exports = (bot) => {
       }
     }
 
-    origOn(ev, (...a) => {
-      wrapped(...a)
-    }, ...a)
+    if (breakSymetry) {
+      origOn(ev, (...a) => { // this DOESN'T queue messages since it doesn't return a promise
+        wrapped(...a)
+      }, ...a)
+    } else {
+      origOn(ev, wrapped, ...a)
+    }
   }
 
   return Sentry
