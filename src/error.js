@@ -5,12 +5,14 @@ const ERROR_REPLY = 'Sorry, but something went wrong internally'
 
 const Sentry = require('@sentry/node')
 
-module.exports = (bot, breakSymetry) => {
+module.exports = (bot, hooks, breakSymetry) => { // TODO: move hooks to main, add this as hook
   Sentry.init({dsn: process.env.SENTRY_DSN})
 
   const origOn = bot.on.bind(bot)
   bot.on = (ev, fnc, ...a) => {
     let wrapped = async (msg, ...a) => {
+      hooks.forEach(fnc => fnc(msg, ...a))
+
       try {
         let res = await fnc(msg, ...a)
         return res

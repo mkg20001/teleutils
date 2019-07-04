@@ -9,9 +9,21 @@ const _EXEC = require('./exec')
 const _FETCH = require('./fetch')
 const _QUEUE = require('./queue')
 const _TMP = require('./tmp')
+const _TELEMETRY = require('./telemetry')
 
-module.exports = (id, {token, helloMessage, TMP, FETCH, breakSymetry}) => {
+const getMatomoParams = () => {
+  if (process.env.MATOMO_DSN) {
+    const parsed = new URL(process.env.MATOMO_DSN)
+    return {
+      siteId: parseInt(parsed.username, 10),
+      server: parsed.hostname
+    }
+  }
+}
+
+module.exports = (id, {token, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}) => {
   log('inizializing')
+  let hooks = []
 
   // base initialization
   const bot = new TeleBot({
@@ -29,10 +41,15 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, breakSymetry}) => {
   }
 
   // component initialization
-  const error = _ERROR(bot, breakSymetry)
+  const error = _ERROR(bot, hooks, breakSymetry)
   const queue = _QUEUE()
   const tmp = _TMP(id, TMP || {})
   const fetch = _FETCH(bot, tmp, FETCH || {})
+  const telemetry = _TELEMETRY(id, error, TELEMETRY || getMatomoParams())
+
+  hooks.push((msg) => {
+    msg.track = telemetry.wrapper(msg)
+  })
 
   return {
     start: () => {
@@ -51,6 +68,7 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, breakSymetry}) => {
     exec: _EXEC,
     fetch,
     tmp: tmp.getTmpFile,
-    queue
+    queue,
+    telemetry
   }
 }

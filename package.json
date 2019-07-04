@@ -16,6 +16,7 @@
   "dependencies": {
     "@sentry/node": "^5.4.3",
     "bl": "^3.0.0",
+    "matomo-tracker": "^2.2.1",
     "mkdirp": "^0.5.1",
     "node-fetch": "^2.6.0",
     "pino": "^5.12.6",
