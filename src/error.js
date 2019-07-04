@@ -15,6 +15,12 @@ module.exports = (bot, breakSymetry) => {
         let res = await fnc(msg, ...a)
         return res
       } catch (err) {
+        if (err.ok === false && !(err instanceof Error)) {
+          let _e = err
+          err = new Error(`Telebot: [${err.error_code}] ${err.description}`)
+          Object.assign(err, _e)
+        }
+
         log(err)
 
         if (!err.friendly) { // don't catch user generated errors
