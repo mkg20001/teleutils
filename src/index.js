@@ -14,7 +14,8 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, breakSymetry}) => {
   log('inizializing')
 
   // base initialization
-  const bot = new TeleBot(token, {
+  const bot = new TeleBot({
+    token,
     polling: { // Optional. Use polling.
       interval: 1000, // Optional. How often check updates (in ms).
       timeout: 0, // Optional. Update polling timeout (0 - short polling).
