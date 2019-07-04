@@ -84,7 +84,7 @@ module.exports = (id, error, {siteId, server}) => {
       e_n: eventName,
       new_visit: newVisit,
       // ua
-      uid: `${UserID}ddd`,
+      uid: `${UserID}`,
       url: `https://${id}.tg.com/${eventData[0]}`
     })
   }
