@@ -17,8 +17,8 @@ module.exports = (bot, breakSymetry) => {
       } catch (err) {
         if (err.ok === false && !(err instanceof Error)) {
           let _e = err
-          err = new Error(`Telebot: [${err.error_code}] ${err.description}`)
-          Object.assign(err, _e)
+          err = new Error(`Telebot: [${err.error_code}] ${err.description}`) // eslint-disable-line no-ex-assign
+          Object.assign(err, _e) // justification for the above: really our exception parameter is not an exception, so we make it one
         }
 
         log(err)
@@ -29,7 +29,25 @@ module.exports = (bot, breakSymetry) => {
 
         if (!err.friendly) { // don't catch user generated errors
           warn(err.stack)
-          Sentry.captureException(err)
+
+          Sentry.withScope(scope => {
+            const msgChannelType = msg.chat.type
+            const msgIsForward = Boolean(msg.forward) // TODO: test
+            const msgContentType = ['text', 'photo', 'video', 'videoNote', 'file', 'sticker', 'audio', 'voice', 'game', 'action', 'location', 'place'].filter(type => Boolean(msg[type]))[0]
+            const msgType = msgChannelType + '.' + (msgIsForward ? 'forward+' : '') + msgContentType
+
+            scope.setTag('type', msgType)
+            scope.setUser(msg.from)
+
+            scope._breadcrumbs.push({
+              timestamp: msg.date,
+              category: 'telegram',
+              level: 'log',
+              message: `Recieved ${msgChannelType} ${msgContentType} message (forwarded ${msgIsForward})`
+            })
+
+            Sentry.captureException(err)
+          })
         }
 
         try {
@@ -45,7 +63,7 @@ module.exports = (bot, breakSymetry) => {
         wrapped(...a)
       }, ...a)
     } else {
-      origOn(ev, wrapped, ...a)
+      return origOn(ev, wrapped, ...a)
     }
   }
 
