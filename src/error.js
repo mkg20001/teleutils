@@ -23,6 +23,10 @@ module.exports = (bot, breakSymetry) => {
 
         log(err)
 
+        if (err.description === 'Forbidden: bot was blocked by the user') { // completly ignore blocks
+          return
+        }
+
         if (!err.friendly) { // don't catch user generated errors
           warn(err.stack)
           Sentry.captureException(err)
