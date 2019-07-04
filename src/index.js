@@ -14,7 +14,14 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, breakSymetry}) => {
   log('inizializing')
 
   // base initialization
-  const bot = new TeleBot(token)
+  const bot = new TeleBot(token, {
+    polling: { // Optional. Use polling.
+      interval: 1000, // Optional. How often check updates (in ms).
+      timeout: 0, // Optional. Update polling timeout (0 - short polling).
+      limit: 10, // Optional. Limits the number of updates to be retrieved.
+      retryTimeout: 2000 // Optional. Reconnecting timeout (in ms).
+    }
+  })
 
   if (helloMessage) {
     bot.on(['/start', '/hello', '/help'], (msg) => msg.reply.text(helloMessage, {webPreview: false, parseMode: 'markdown'}))
