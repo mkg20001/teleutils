@@ -37,7 +37,10 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}
   })
 
   if (helloMessage) {
-    bot.on(['/start', '/hello', '/help'], (msg) => msg.reply.text(helloMessage, {webPreview: false, parseMode: 'markdown'}))
+    bot.on(['/start', '/hello', '/help'], async (msg) => {
+      await msg.track('bot/started')
+      await msg.reply.text(helloMessage, {webPreview: false, parseMode: 'markdown'})
+    })
   }
 
   // component initialization
