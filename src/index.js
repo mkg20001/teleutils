@@ -18,6 +18,8 @@ const getMatomoParams = () => {
       siteId: parseInt(parsed.username, 10),
       server: parsed.hostname
     }
+  } else {
+    return {}
   }
 }
 
