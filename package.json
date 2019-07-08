@@ -14,7 +14,7 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@sentry/node": "^5.4.3",
+    "@sentry/node": "^5.5.0",
     "bl": "^3.0.0",
     "matomo-tracker": "^2.2.1",
     "mkdirp": "^0.5.1",
