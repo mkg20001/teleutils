@@ -56,13 +56,14 @@ module.exports = (bot, TMP, {MAX_SIZE}) => {
 
     log('Downloading %s...', file.file_id)
 
-    const f2 = await bot.getFile(file.file_id)
+    const f2 = await bot.telegram.getFile(file.file_id)
+    const link = await bot.telegram.getFileLink(file.file_id)
 
     if (f2.file_size > MAX_SIZE) { // dbl check
       throw friendlyError(new Error('MAX_SIZE exceeded'), 'Sorry, but we only support files up to 25MB!')
     }
 
-    return webFetchToTmp(f2.fileLink, path.basename(f2.file_path || ''))
+    return webFetchToTmp(link, path.basename(f2.file_path || ''))
   }
 
   return {

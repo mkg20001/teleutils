@@ -8,9 +8,15 @@ const crypto = require('crypto')
 const sha256 = (str) => crypto.createHash('sha256').update(String(str)).digest('hex')
 const anon = (id) => sha256(sha256(id)).substr(0, 12)
 
-module.exports = (id, error, {siteId, server}) => {
+module.exports = (bot, id, error, {siteId, server}) => {
   if (!server) {
     log('tracking disabled')
+
+    bot.use(async (ctx, next) => {
+      ctx.track = () => {}
+      await next(ctx)
+    })
+
     return {
       wrapper: async () => async () => {},
       track: async () => {}
@@ -88,6 +94,11 @@ module.exports = (id, error, {siteId, server}) => {
       url: `https://${id}.tg.com/${eventData[0]}`
     })
   }
+
+  bot.use(async (ctx, next) => {
+    ctx.track = await trackerWrapper(ctx)
+    await next(ctx)
+  })
 
   return {
     wrapper: trackerWrapper,

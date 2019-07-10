@@ -2,8 +2,9 @@
 
 const {log} = require('./internal')('core')
 
-const TeleBot = require('telebot')
+const Telegraf = require('telegraf')
 
+const _SUGAR = require('./sugar')
 const _ERROR = require('./error')
 const _EXEC = require('./exec')
 const _FETCH = require('./fetch')
@@ -23,46 +24,39 @@ const getMatomoParams = () => {
   }
 }
 
-module.exports = (id, {token, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}) => {
+module.exports = (id, {token, telegrafOptions, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}) => {
   log('inizializing')
   let hooks = []
 
   // base initialization
-  const bot = new TeleBot({
-    token,
-    polling: { // Optional. Use polling.
-      interval: 1000, // Optional. How often check updates (in ms).
-      timeout: 0, // Optional. Update polling timeout (0 - short polling).
-      limit: 10, // Optional. Limits the number of updates to be retrieved.
-      retryTimeout: 2000 // Optional. Reconnecting timeout (in ms).
-    }
-  })
+  const bot = new Telegraf(token, telegrafOptions)
 
-  if (helloMessage) {
-    bot.on(['/start', '/hello', '/help'], async (msg) => {
-      await msg.track('bot/started')
-      await msg.reply.text(helloMessage, {webPreview: false, parseMode: 'markdown'})
-    })
-  }
+  _SUGAR(bot)
 
   // component initialization
   const error = _ERROR(bot, hooks, breakSymetry)
   const queue = _QUEUE()
   const tmp = _TMP(id, TMP || {})
   const fetch = _FETCH(bot, tmp, FETCH || {})
-  const telemetry = _TELEMETRY(id, error, TELEMETRY || getMatomoParams())
+  const telemetry = _TELEMETRY(bot, id, error, TELEMETRY || getMatomoParams())
 
-  hooks.push((msg) => {
-    msg.track = telemetry.wrapper(msg)
-  })
+  if (helloMessage) {
+    const hello = async (ctx) => {
+      await ctx.track('bot/started')
+      await ctx.replyWithMarkdown(helloMessage, {disable_web_page_preview: true})
+    }
+    bot.start(hello)
+    bot.command('hello', hello)
+    bot.command('help', hello)
+  }
 
   return {
-    start: () => {
+    start: async () => {
       log('starting')
       tmp.start()
-      bot.start()
+      bot.launch()
     },
-    stop: () => {
+    stop: async () => {
       log('stopping')
       bot.stop()
       tmp.stop()
