@@ -12,7 +12,7 @@ module.exports = (id, error, {siteId, server}) => {
   if (!server) {
     log('tracking disabled')
     return {
-      wrapper: async () => async () => {},
+      wrapper: () => () => Promise.resolve(true),
       track: async () => {}
     }
   }
