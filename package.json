@@ -1,6 +1,6 @@
 {
   "name": "teleutils",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "My utilities to build telebot based telegram bots",
   "main": "src/index.js",
   "scripts": {
