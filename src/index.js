@@ -1,6 +1,6 @@
 'use strict'
 
-const {log} = require('./internal')('core')
+const { log } = require('./internal')('core')
 
 const TeleBot = require('telebot')
 
@@ -10,6 +10,7 @@ const _FETCH = require('./fetch')
 const _QUEUE = require('./queue')
 const _TMP = require('./tmp')
 const _TELEMETRY = require('./telemetry')
+const _TRANSLATE = require('./translate')
 
 const getMatomoParams = () => {
   if (process.env.MATOMO_DSN) {
@@ -23,9 +24,9 @@ const getMatomoParams = () => {
   }
 }
 
-module.exports = (id, {token, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}) => {
+module.exports = (id, { token, helloMessage, TMP, FETCH, TELEMETRY, TRANSLATE, breakSymetry }) => {
   log('inizializing')
-  let hooks = []
+  const hooks = []
 
   // base initialization
   const bot = new TeleBot({
@@ -41,7 +42,7 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}
   if (helloMessage) {
     bot.on(['/start', '/hello', '/help'], async (msg) => {
       await msg.track('bot/started')
-      await msg.reply.text(helloMessage, {webPreview: false, parseMode: 'markdown'})
+      await msg.reply.text(helloMessage, { webPreview: false, parseMode: 'markdown' })
     })
   }
 
@@ -51,9 +52,11 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}
   const tmp = _TMP(id, TMP || {})
   const fetch = _FETCH(bot, tmp, FETCH || {})
   const telemetry = _TELEMETRY(id, error, TELEMETRY || getMatomoParams())
+  const translate = _TRANSLATE(TRANSLATE)
 
   hooks.push((msg) => {
     msg.track = telemetry.wrapper(msg)
+    msg.translate = translate.wrapper(msg)
   })
 
   return {
@@ -73,6 +76,7 @@ module.exports = (id, {token, helloMessage, TMP, FETCH, TELEMETRY, breakSymetry}
     exec: _EXEC,
     fetch,
     tmp: tmp.getTmpFile,
+    translate: translate.translate,
     queue,
     telemetry
   }
