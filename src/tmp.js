@@ -1,6 +1,6 @@
 'use strict'
 
-const {log, warn} = require('./internal')('tmp')
+const { log, warn } = require('./internal')('tmp')
 
 const mkdir = require('mkdirp').sync
 const rimraf = require('rimraf').sync
@@ -9,7 +9,7 @@ const path = require('path')
 const fs = require('fs')
 const crypto = require('crypto')
 
-module.exports = (id, {interval}) => {
+module.exports = (id, { interval }) => {
   const TMP = path.join(os.tmpdir(), id)
   let TMPFILES = []
   let _interval
@@ -34,11 +34,15 @@ module.exports = (id, {interval}) => {
 
         return true
       } else {
-        if (file.cleaned) {
-          if (file.expiresAt < Date.now()) {
+        if (file.expiresAt < Date.now()) {
+          if (!file.cleaned) {
             warn('file %s expired, without cleaning', file.path)
           }
+
+          return false
         }
+
+        return true
       }
     })
 
