@@ -52,7 +52,7 @@ module.exports = (id, { token, helloMessage, TMP, FETCH, TELEMETRY, TRANSLATE, b
   const tmp = _TMP(id, TMP || {})
   const fetch = _FETCH(bot, tmp, FETCH || {})
   const telemetry = _TELEMETRY(id, error, TELEMETRY || getMatomoParams())
-  const translate = _TRANSLATE(TRANSLATE)
+  const translate = _TRANSLATE(TRANSLATE || {})
 
   hooks.push((msg) => {
     msg.track = telemetry.wrapper(msg)
