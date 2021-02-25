@@ -1,5 +1,12 @@
+
+# custom
+
 package-lock.json
 node_modules
 *.bak
 teleutils:*
 yarn.lock
+
+# node
+
+yarn-error.log
